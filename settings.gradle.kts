@@ -1,4 +1,4 @@
-rootProject.name = "breakbadhabits"
+rootProject.name = "MindReset"
 
 pluginManagement {
     repositories {

@@ -55,18 +55,18 @@ kotlin {
 }
 
 android {
-    namespace = "epicarchitect.breakbadhabits"
+    namespace = "epicarchitect.mindreset"
     bundle.storeArchive.enable = true
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "kolmachikhin.alexander.breakbadhabits"
+        applicationId = "kolmachikhin.alexander.mindreset"
         resourceConfigurations += setOf("en", "ru")
         minSdk = 26
         targetSdk = 35
         versionCode = 85
         versionName = "4.3.0"
-        base.archivesName.set("breakbadhabits-$versionName")
+        base.archivesName.set("mindreset-$versionName")
     }
 
     buildTypes {
@@ -85,7 +85,7 @@ android {
 sqldelight {
     databases {
         create("AppDatabase") {
-            packageName.set("epicarchitect.breakbadhabits.database")
+            packageName.set("epicarchitect.mindreset.database")
         }
     }
 }

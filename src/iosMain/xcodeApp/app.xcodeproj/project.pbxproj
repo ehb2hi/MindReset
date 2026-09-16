@@ -7,13 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		FAFF65F42BE21C820077393D /* MindResetApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAFF65F32BE21C820077393D /* MindResetApp.swift */; };
+		FAFF65F42BE21C820077393D /* HablyraApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAFF65F32BE21C820077393D /* HablyraApp.swift */; };
 		FAFF65F82BE21C830077393D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FAFF65F72BE21C830077393D /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		FAFF65F02BE21C820077393D /* app.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = app.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		FAFF65F32BE21C820077393D /* MindResetApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MindResetApp.swift; sourceTree = "<group>"; };
+		FAFF65F32BE21C820077393D /* HablyraApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HablyraApp.swift; sourceTree = "<group>"; };
 		FAFF65F72BE21C830077393D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -47,7 +47,7 @@
 		FAFF65F22BE21C820077393D /* app */ = {
 			isa = PBXGroup;
 			children = (
-				FAFF65F32BE21C820077393D /* MindResetApp.swift */,
+				FAFF65F32BE21C820077393D /* HablyraApp.swift */,
 				FAFF65F72BE21C830077393D /* Assets.xcassets */,
 			);
 			path = app;
@@ -70,7 +70,7 @@
 			dependencies = (
 			);
 			name = app;
-			productName = mindreset;
+			productName = Hablyra;
 			productReference = FAFF65F02BE21C820077393D /* app.app */;
 			productType = "com.apple.product-type.application";
 		};
@@ -144,7 +144,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FAFF65F42BE21C820077393D /* MindResetApp.swift in Sources */,
+				FAFF65F42BE21C820077393D /* HablyraApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -283,7 +283,7 @@
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				FRAMEWORK_SEARCH_PATHS = "../../build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)";
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Mind Reset";
+				INFOPLIST_KEY_CFBundleDisplayName = "Hablyra";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -317,7 +317,7 @@
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				FRAMEWORK_SEARCH_PATHS = "../../build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)";
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Mind Reset";
+				INFOPLIST_KEY_CFBundleDisplayName = "Hablyra";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;

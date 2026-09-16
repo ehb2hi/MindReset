@@ -29,6 +29,7 @@ kotlin {
             implementation(compose.foundation)
             implementation(compose.material3)
             implementation(compose.materialIconsExtended)
+            implementation(compose.components.uiToolingPreview)
             implementation(libs.jetbrains.kotlinDatetime)
             implementation(libs.jetbrains.kotlinCoroutinesCore)
             implementation(libs.jetbrains.navigationCompose)
@@ -55,18 +56,18 @@ kotlin {
 }
 
 android {
-    namespace = "epicarchitect.mindreset"
+    namespace = "app.hablyra.mobile"
     bundle.storeArchive.enable = true
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "kolmachikhin.alexander.mindreset"
+        applicationId = "app.hablyra.mobile"
         resourceConfigurations += setOf("en", "ru")
         minSdk = 26
         targetSdk = 35
         versionCode = 85
         versionName = "4.3.0"
-        base.archivesName.set("mindreset-$versionName")
+        base.archivesName.set("hablyra-$versionName")
     }
 
     buildTypes {
@@ -85,7 +86,7 @@ android {
 sqldelight {
     databases {
         create("AppDatabase") {
-            packageName.set("epicarchitect.mindreset.database")
+            packageName.set("app.hablyra.database")
         }
     }
 }

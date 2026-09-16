@@ -61,7 +61,8 @@ fun DateTimeRangeInputCard(
     error: String? = null,
     modifier: Modifier = Modifier,
     showAsRangeMode: Boolean,
-    onRangeModeChanged: (Boolean) -> Unit
+    onRangeModeChanged: (Boolean) -> Unit,
+    showNowLabel: Boolean = false
 ) {
     val environment = LocalAppEnvironment.current
     val strings = environment.resources.strings.habitEventRecordEditingStrings
@@ -82,6 +83,14 @@ fun DateTimeRangeInputCard(
                     modifier = Modifier.padding(bottom = spacing.space4),
                     text = startTimeLabel,
                     color = colors.contentSecondary,
+                    style = MaterialTheme.typography.labelLarge
+                )
+            }
+            if (showNowLabel) {
+                Text(
+                    modifier = Modifier.padding(bottom = spacing.space4),
+                    text = strings.nowLabel(),
+                    color = colors.brandPrimary,
                     style = MaterialTheme.typography.labelLarge
                 )
             }

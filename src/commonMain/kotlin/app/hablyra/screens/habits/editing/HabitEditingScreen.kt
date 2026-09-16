@@ -1,6 +1,10 @@
 package app.hablyra.screens.habits.editing
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -9,6 +13,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -16,7 +21,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import app.hablyra.design.HablyraPrimaryButton
@@ -86,7 +93,35 @@ fun HabitEditingScreen(habitId: Int? = null) {
             title = strings.habitIconTitle(),
             description = strings.habitIconDescription()
         ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(spacing.space12)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(spacing.space40)
+                        .clip(MaterialTheme.shapes.medium)
+                        .background(colors.brandSecondary),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = habitIcons.getById(state.selectedIconId).imageVector,
+                        tint = colors.brandPrimary,
+                        contentDescription = strings.iconContentDescription(
+                            state.selectedIconId,
+                            selected = true
+                        )
+                    )
+                }
+                Text(
+                    text = strings.habitIconTitle(),
+                    color = colors.contentPrimary,
+                    style = MaterialTheme.typography.bodyLarge
+                )
+            }
+            Spacer(Modifier.height(spacing.space12))
             SingleSelectionGrid(
+                countInRow = 7,
                 items = habitIcons.items,
                 selectedItem = habitIcons.getById(state.selectedIconId),
                 cell = { icon ->

@@ -26,7 +26,7 @@ class RussianHabitEventRecordEditingStrings : HabitEventRecordEditingStrings {
     override fun startDateTimeLabel() = "Начало"
     override fun endDateTimeLabel() = "Конец"
     override fun done() = "Готово"
-    override fun inputDateTimeAsRangeCheckbox() = "Указать как временной диапазон"
+    override fun inputDateTimeAsRangeCheckbox() = "Добавить длительность / указать диапазон"
 
     override fun eventCountError(error: HabitEventCountError) = when (error) {
         HabitEventCountError.Empty -> {
@@ -40,6 +40,9 @@ class RussianHabitEventRecordEditingStrings : HabitEventRecordEditingStrings {
     }
 
     override fun eventCountTitle() = "События"
-    override fun eventCountDescription() = "Введите, сколько событий произошло."
-    override fun timeRangeDescription() = "Выберите, когда произошло событие."
+    override fun eventCountDescription() = "Сколько раз это произошло?"
+    override fun decreaseEventCountContentDescription() = "Уменьшить количество"
+    override fun increaseEventCountContentDescription() = "Увеличить количество"
+    override fun timeRangeDescription() = "Обычно сейчас. Измените время, если это нужно."
+    override fun nowLabel() = "Сейчас"
 }

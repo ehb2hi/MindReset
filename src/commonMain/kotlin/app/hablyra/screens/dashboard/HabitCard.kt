@@ -9,7 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -25,6 +25,7 @@ import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToOneOrNull
 import app.hablyra.database.Habit
 import app.hablyra.design.HablyraCard
+import app.hablyra.design.HablyraPrimaryButton
 import app.hablyra.design.HablyraTheme
 import app.hablyra.environment.LocalAppEnvironment
 import app.hablyra.format.DurationFormatter
@@ -33,6 +34,7 @@ import app.hablyra.screens.root.LocalRootNavController
 import app.hablyra.screens.root.RootRoute
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
+
 
 @Composable
 fun HabitCard(
@@ -47,80 +49,76 @@ fun HabitCard(
     val icons = environment.habits.icons
     val spacing = HablyraTheme.spacing
     val colors = HablyraTheme.colors
-
     val currentTime by environment.habits.timePulse.state.collectAsState()
     val lastRecordState = remember {
         eventRecordQueries.recordByHabitIdAndMaxEndTime(habit.id)
             .asFlow()
             .mapToOneOrNull(Dispatchers.IO)
     }.collectAsState(null)
-    val abstinence = lastRecordState.value?.abstinence(currentTime)
-    val progressText = abstinence?.let {
-        durationFormatter.format(
-            duration = it,
-            accuracy = DurationFormatter.Accuracy.SECONDS
-        )
+    val progressText = lastRecordState.value?.abstinence(currentTime)?.let {
+        durationFormatter.format(it, DurationFormatter.Accuracy.SECONDS)
     } ?: strings.habitHasNoEvents()
 
     HablyraCard(
         modifier = modifier.fillMaxWidth(),
-        onClick = {
-            navController.navigate(RootRoute.HabitDetails(habit.id))
-        },
+        onClick = { navController.navigate(RootRoute.HabitDetails(habit.id)) }
     ) {
-        Column(
-            modifier = Modifier.padding(spacing.space16),
-            verticalArrangement = Arrangement.spacedBy(spacing.space16)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(spacing.space16),
+            horizontalArrangement = Arrangement.spacedBy(spacing.space16),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(spacing.space12)
+            Box(
+                modifier = Modifier
+                    .size(spacing.space48)
+                    .clip(MaterialTheme.shapes.medium)
+                    .background(colors.brandSecondary),
+                contentAlignment = Alignment.Center
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(spacing.space40)
-                        .clip(MaterialTheme.shapes.small)
-                        .background(colors.surfaceSubtle),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = icons.getById(habit.iconId).imageVector,
-                        tint = colors.brandPrimary,
-                        contentDescription = null
-                    )
-                }
-
+                Icon(
+                    imageVector = icons.getById(habit.iconId).imageVector,
+                    tint = colors.brandPrimary,
+                    contentDescription = habit.name
+                )
+            }
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(spacing.space4)
+            ) {
                 Text(
-                    modifier = Modifier.weight(1f),
                     text = habit.name,
                     color = colors.contentPrimary,
                     style = MaterialTheme.typography.titleMedium,
                     overflow = TextOverflow.Ellipsis,
                     maxLines = 2
                 )
-
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                    tint = colors.contentTertiary,
-                    contentDescription = strings.openHabitContentDescription()
-                )
-            }
-
-            Column(
-                verticalArrangement = Arrangement.spacedBy(spacing.space4)
-            ) {
                 Text(
-                    text = strings.timeSinceLastEventLabel(),
+                    text = strings.currentStreakLabel(),
                     color = colors.contentSecondary,
-                    style = MaterialTheme.typography.labelLarge
+                    style = MaterialTheme.typography.labelMedium
                 )
                 Text(
                     text = progressText,
                     color = colors.contentPrimary,
-                    style = MaterialTheme.typography.titleLarge,
+                    style = MaterialTheme.typography.headlineSmall,
                     overflow = TextOverflow.Ellipsis,
                     maxLines = 2
                 )
+            }
+            HablyraPrimaryButton(
+                onClick = {
+                    navController.navigate(
+                        RootRoute.HabitEventRecordEditing(
+                            habitEventRecordId = null,
+                            habitId = habit.id
+                        )
+                    )
+                }
+            ) {
+                Icon(imageVector = Icons.Filled.Add, contentDescription = null)
+                Text(text = strings.addHabitEventRecord())
             }
         }
     }

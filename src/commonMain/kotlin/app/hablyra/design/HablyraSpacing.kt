@@ -14,6 +14,7 @@ data class HablyraSpacing(
     val space24: Dp = 24.dp,
     val space32: Dp = 32.dp,
     val space40: Dp = 40.dp,
+    val space48: Dp = 48.dp,
     val screenHorizontal: Dp = 20.dp,
     val denseHorizontal: Dp = 16.dp
 )

@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
@@ -65,6 +67,12 @@ fun HabitDetailsScreen(habitId: Int) {
         )
 
         if (state.habitEventRecords.isNotEmpty()) {
+            Text(
+                modifier = Modifier.padding(horizontal = HablyraTheme.spacing.screenHorizontal),
+                text = strings.abstinenceChartTitle(),
+                color = HablyraTheme.colors.contentPrimary,
+                style = MaterialTheme.typography.titleLarge
+            )
             Spacer(Modifier.height(HablyraTheme.spacing.space20))
             HabitDetailsCalendarCard(
                 modifier = Modifier
@@ -75,6 +83,12 @@ fun HabitDetailsScreen(habitId: Int) {
         }
 
         if (state.abstinenceHistogramValues.size > 2) {
+            Text(
+                modifier = Modifier.padding(horizontal = HablyraTheme.spacing.screenHorizontal),
+                text = strings.statisticsTitle(),
+                color = HablyraTheme.colors.contentPrimary,
+                style = MaterialTheme.typography.titleLarge
+            )
             Spacer(Modifier.height(HablyraTheme.spacing.space20))
             HabitDetailsHistogramCard(
                 modifier = Modifier

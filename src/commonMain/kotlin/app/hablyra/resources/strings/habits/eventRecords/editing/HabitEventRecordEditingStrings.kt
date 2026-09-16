@@ -17,8 +17,11 @@ interface HabitEventRecordEditingStrings {
     fun confirmDeleteButton(): String
     fun eventCountTitle(): String
     fun eventCountDescription(): String
+    fun decreaseEventCountContentDescription(): String
+    fun increaseEventCountContentDescription(): String
     fun eventCountError(error: HabitEventCountError): String
     fun timeRangeDescription(): String
+    fun nowLabel(): String
     fun timeRangeError(error: HabitEventRecordTimeRangeError): String
     fun timeRangeTitle(): String
     fun startDateTimeLabel(): String

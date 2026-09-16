@@ -1,6 +1,7 @@
 package app.hablyra.design
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -19,6 +21,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
 
 @Composable
 fun HablyraPrimaryButton(
@@ -105,6 +109,7 @@ fun EmptyState(
     title: String,
     description: String,
     modifier: Modifier = Modifier,
+    visual: @Composable (() -> Unit)? = null,
     action: @Composable (() -> Unit)? = null
 ) {
     val colors = HablyraTheme.colors
@@ -130,5 +135,18 @@ fun EmptyState(
         if (action != null) {
             action()
         }
+    }
+}
+
+@Composable
+fun LoopMark(
+    modifier: Modifier = Modifier,
+    size: androidx.compose.ui.unit.Dp = 72.dp
+) {
+    val colors = HablyraTheme.colors
+    Canvas(modifier = modifier.size(size)) {
+        val stroke = size.toPx() * 0.12f
+        drawArc(color = colors.brandSecondary, startAngle = 24f, sweepAngle = 286f, useCenter = false, style = Stroke(width = stroke, cap = StrokeCap.Round))
+        drawArc(color = colors.brandPrimary, startAngle = 204f, sweepAngle = 94f, useCenter = false, style = Stroke(width = stroke, cap = StrokeCap.Round))
     }
 }

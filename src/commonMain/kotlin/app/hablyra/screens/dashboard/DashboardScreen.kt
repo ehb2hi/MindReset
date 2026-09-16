@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import app.hablyra.design.EmptyState
 import app.hablyra.design.HablyraPrimaryButton
+import app.hablyra.design.LoopMark
 import app.hablyra.design.HablyraTheme
 import app.hablyra.environment.LocalAppEnvironment
 import app.hablyra.screens.root.LocalRootNavController
@@ -71,8 +72,10 @@ fun DashboardScreen() {
             if (state.habits.isEmpty()) {
                 EmptyState(
                     modifier = Modifier
-                        .align(Alignment.Center)
+                        .align(Alignment.TopCenter)
+                        .padding(top = spacing.space48)
                         .padding(horizontal = spacing.screenHorizontal),
+                    visual = { LoopMark() },
                     title = strings.emptyHabitsTitle(),
                     description = strings.emptyHabitsText(),
                     action = {

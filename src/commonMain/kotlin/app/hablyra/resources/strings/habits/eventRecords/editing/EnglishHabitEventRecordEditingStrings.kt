@@ -32,14 +32,17 @@ class EnglishHabitEventRecordEditingStrings : HabitEventRecordEditingStrings {
     override fun startDateTimeLabel() = "Start"
     override fun endDateTimeLabel() = "End"
     override fun done() = "Done"
-    override fun inputDateTimeAsRangeCheckbox() = "Specify as time range"
+    override fun inputDateTimeAsRangeCheckbox() = "Add duration / specify time range"
 
     override fun timeRangeTitle() = "Date and time"
     override fun timeRangeError(error: HabitEventRecordTimeRangeError) = when (error) {
         HabitEventRecordTimeRangeError.BiggestThenCurrentTime -> "The date and time cannot be greater than the current time."
     }
 
-    override fun eventCountDescription() = "Enter how many occurrences happened."
+    override fun eventCountDescription() = "How many times did it happen?"
+    override fun decreaseEventCountContentDescription() = "Decrease occurrences"
+    override fun increaseEventCountContentDescription() = "Increase occurrences"
     override fun eventCountTitle() = "Occurrences"
-    override fun timeRangeDescription() = "Select when the event happened."
+    override fun timeRangeDescription() = "Usually now. Edit the time only when needed."
+    override fun nowLabel() = "Now"
 }

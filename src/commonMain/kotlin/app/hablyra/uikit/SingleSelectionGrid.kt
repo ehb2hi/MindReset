@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
@@ -46,7 +48,7 @@ fun <T> SingleSelectionGrid(
         repeat(countRows) { rowIndex ->
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(spacing.space8)
+                horizontalArrangement = Arrangement.spacedBy(spacing.space4)
             ) {
                 repeat(countInRow) { itemIndex ->
                     val item = items.getOrNull(rowIndex * countInRow + itemIndex)
@@ -61,7 +63,8 @@ fun <T> SingleSelectionGrid(
 
                         Card(
                             modifier = Modifier
-                                .size(spacing.space40 + spacing.space8)
+                                .weight(1f)
+                                .aspectRatio(1f)
                                 .then(semanticsModifier),
                             shape = MaterialTheme.shapes.small,
                             onClick = {
@@ -102,6 +105,8 @@ fun <T> SingleSelectionGrid(
                                 }
                             }
                         }
+                    } else {
+                        Spacer(Modifier.weight(1f).aspectRatio(1f))
                     }
                 }
             }

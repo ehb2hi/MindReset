@@ -225,3 +225,114 @@ private fun LogEventPreviewContent(rangeExpanded: Boolean) {
         ) { Text(text = "Save event") }
     }
 }
+
+
+@Preview
+@Composable
+fun HablyraHistoryPreview() {
+    HablyraTheme {
+        Surface(color = HablyraTheme.colors.background) {
+            Column(
+                modifier = Modifier.padding(HablyraTheme.spacing.space20),
+                verticalArrangement = Arrangement.spacedBy(HablyraTheme.spacing.space12)
+            ) {
+                Text("History", style = androidx.compose.material3.MaterialTheme.typography.headlineLarge)
+                Text("Evening scrolling", color = HablyraTheme.colors.brandPrimary)
+                EventRecordItemContent(
+                    dateTimeText = "September 16, 2026, 17:52",
+                    eventCountText = "Occurrences: 1",
+                    comment = "A short note about the context.",
+                    editContentDescription = "Edit event",
+                    onClick = {}
+                )
+            }
+        }
+    }
+}
+
+@Preview
+@Composable
+fun HablyraInsightsDarkPreview() {
+    HablyraTheme(darkTheme = true) {
+        Surface(color = HablyraTheme.colors.background) {
+            Column(
+                modifier = Modifier.padding(HablyraTheme.spacing.space20),
+                verticalArrangement = Arrangement.spacedBy(HablyraTheme.spacing.space16)
+            ) {
+                Text("Insights", style = androidx.compose.material3.MaterialTheme.typography.headlineLarge)
+                PreviewHabitCard(name = "Evening scrolling", progress = "3d 8h")
+            }
+        }
+    }
+}
+
+@Preview
+@Composable
+fun HablyraSettingsPreview() {
+    HablyraTheme {
+        Surface(color = HablyraTheme.colors.background) {
+            Column(
+                modifier = Modifier.padding(HablyraTheme.spacing.space20),
+                verticalArrangement = Arrangement.spacedBy(HablyraTheme.spacing.space16)
+            ) {
+                Text("Settings", style = androidx.compose.material3.MaterialTheme.typography.headlineLarge)
+                Text("Appearance", style = androidx.compose.material3.MaterialTheme.typography.titleMedium)
+                Text("System default", color = HablyraTheme.colors.contentSecondary)
+                Text("About Hablyra", style = androidx.compose.material3.MaterialTheme.typography.titleMedium)
+            }
+        }
+    }
+}
+
+@Preview
+@Composable
+fun HablyraLargeTextDashboardPreview() {
+    val density = androidx.compose.ui.platform.LocalDensity.current
+    androidx.compose.runtime.CompositionLocalProvider(
+        androidx.compose.ui.platform.LocalDensity provides androidx.compose.ui.unit.Density(
+            density = density.density,
+            fontScale = 2f
+        )
+    ) {
+        HablyraTheme {
+            Surface(color = HablyraTheme.colors.background) {
+                Column(
+                    modifier = Modifier.padding(HablyraTheme.spacing.space20),
+                    verticalArrangement = Arrangement.spacedBy(HablyraTheme.spacing.space16)
+                ) {
+                    Text(
+                        "Hablyra",
+                        style = androidx.compose.material3.MaterialTheme.typography.headlineLarge
+                    )
+                    PreviewHabitCard(
+                        name = "A deliberately long habit name that wraps safely",
+                        progress = "12 days"
+                    )
+                }
+            }
+        }
+    }
+}
+
+
+@Preview
+@Composable
+fun HablyraEditHabitPreview() {
+    HablyraTheme(darkTheme = true) {
+        Surface(color = HablyraTheme.colors.background) {
+            Column(
+                modifier = Modifier.padding(HablyraTheme.spacing.space20),
+                verticalArrangement = Arrangement.spacedBy(HablyraTheme.spacing.space16)
+            ) {
+                Text("Edit habit", style = androidx.compose.material3.MaterialTheme.typography.headlineMedium)
+                Text("Habit name", style = androidx.compose.material3.MaterialTheme.typography.titleMedium)
+                Text("Evening scrolling", style = androidx.compose.material3.MaterialTheme.typography.bodyLarge)
+                Text("Choose an icon", style = androidx.compose.material3.MaterialTheme.typography.titleMedium)
+                LoopMark(size = HablyraTheme.spacing.space48)
+                HablyraPrimaryButton(modifier = Modifier.fillMaxWidth(), onClick = {}) {
+                    Text("Save changes")
+                }
+            }
+        }
+    }
+}

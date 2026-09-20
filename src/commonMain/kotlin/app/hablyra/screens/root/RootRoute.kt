@@ -8,6 +8,15 @@ sealed interface RootRoute {
     data object Dashboard : RootRoute
 
     @Serializable
+    data object History : RootRoute
+
+    @Serializable
+    data object Insights : RootRoute
+
+    @Serializable
+    data object Settings : RootRoute
+
+    @Serializable
     data class HabitDetails(
         val habitId: Int
     ) : RootRoute

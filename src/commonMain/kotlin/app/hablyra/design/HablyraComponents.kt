@@ -19,6 +19,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.graphics.StrokeCap
@@ -120,6 +122,9 @@ fun EmptyState(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(HablyraTheme.spacing.space12)
     ) {
+        if (visual != null) {
+            visual()
+        }
         Text(
             text = title,
             color = colors.contentPrimary,
@@ -141,12 +146,29 @@ fun EmptyState(
 @Composable
 fun LoopMark(
     modifier: Modifier = Modifier,
-    size: androidx.compose.ui.unit.Dp = 72.dp
+    size: androidx.compose.ui.unit.Dp = 72.dp,
+    progress: Float? = null,
+    contentDescription: String? = null
 ) {
     val colors = HablyraTheme.colors
-    Canvas(modifier = modifier.size(size)) {
+    val safeProgress = progress?.coerceIn(0f, 1f)
+    Canvas(
+        modifier = modifier
+            .size(size)
+            .then(
+                if (contentDescription == null) Modifier
+                else Modifier.semantics { this.contentDescription = contentDescription }
+            )
+    ) {
         val stroke = size.toPx() * 0.12f
-        drawArc(color = colors.brandSecondary, startAngle = 24f, sweepAngle = 286f, useCenter = false, style = Stroke(width = stroke, cap = StrokeCap.Round))
-        drawArc(color = colors.brandPrimary, startAngle = 204f, sweepAngle = 94f, useCenter = false, style = Stroke(width = stroke, cap = StrokeCap.Round))
+        val totalSweep = 286f
+        drawArc(color = colors.brandSecondary, startAngle = 24f, sweepAngle = totalSweep, useCenter = false, style = Stroke(width = stroke, cap = StrokeCap.Round))
+        drawArc(
+            color = colors.brandPrimary,
+            startAngle = 24f,
+            sweepAngle = if (safeProgress == null) 94f else totalSweep * safeProgress,
+            useCenter = false,
+            style = Stroke(width = stroke, cap = StrokeCap.Round)
+        )
     }
 }

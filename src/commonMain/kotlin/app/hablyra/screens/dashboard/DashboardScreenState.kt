@@ -7,27 +7,29 @@ import androidx.compose.runtime.remember
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import app.hablyra.database.Habit
+import app.hablyra.database.HabitEventRecord
 import app.hablyra.environment.LocalAppEnvironment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 
 @Immutable
 data class DashboardScreenState(
-    val habits: List<Habit>
+    val habits: List<Habit>,
+    val records: List<HabitEventRecord>
 )
 
 @Composable
 fun rememberDashboardScreenState(): DashboardScreenState? {
     val environment = LocalAppEnvironment.current
     val habitQueries = environment.database.habitQueries
-    val habitState = remember {
+    val recordQueries = environment.database.habitEventRecordQueries
+    val habits = remember {
         habitQueries.habits().asFlow().mapToList(Dispatchers.IO)
-    }.collectAsState(null)
-
-    val habits = habitState.value
-
-    return remember(habits) {
-        if (habits == null) null
-        else DashboardScreenState(habits)
+    }.collectAsState(null).value
+    val records = remember {
+        recordQueries.records().asFlow().mapToList(Dispatchers.IO)
+    }.collectAsState(null).value
+    return remember(habits, records) {
+        if (habits == null || records == null) null else DashboardScreenState(habits, records)
     }
 }

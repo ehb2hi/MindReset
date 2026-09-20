@@ -149,3 +149,76 @@ Recommended order:
 - handle load failure gracefully
 - app functionality must remain usable when ads fail or consent disallows personalized ads
 - reserve/animate ad space carefully to minimize layout shift
+
+## 9. Android AdMob and UMP configuration
+
+The Android implementation uses Google Mobile Ads SDK `25.5.0` and UMP SDK `4.0.0`.
+Firebase is initialized before UMP, and Mobile Ads initialization is gated by
+`ConsentInformation.canRequestAds()`. UMP is the source of truth for consent; product code must not
+infer consent from cached strings or map consent categories itself.
+
+### Build configuration
+
+Debug builds always use Google's official sample AdMob app ID and adaptive banner ad unit ID. Release
+IDs are intentionally absent from source control and must be supplied as Gradle properties or
+environment variables:
+
+- `HABLYRA_ADMOB_APP_ID`: the AdMob app ID for Android package `app.hablyra.mobile`
+- `HABLYRA_ADMOB_BANNER_ID`: the production Dashboard banner ad unit ID
+
+Locally, put them in the developer's global `~/.gradle/gradle.properties`, pass them with `-P`,
+or export same-named environment variables. Do not put them in the repository's `gradle.properties`
+and do not duplicate them in Kotlin or UI code.
+
+### UMP debug testing
+
+Debug builds accept these optional Gradle properties:
+
+- `HABLYRA_UMP_DEBUG_GEOGRAPHY=eea` forces the EEA/UK/Switzerland consent path.
+- `HABLYRA_UMP_DEBUG_GEOGRAPHY=not_eea` forces the non-regulated `OTHER` geography.
+- `HABLYRA_UMP_TEST_DEVICE_ID=<hashed-id>` registers a physical device reported by UMP logcat.
+- `HABLYRA_UMP_RESET=true` calls UMP's supported `reset()` once on each debug process launch.
+
+Android emulators are UMP test devices automatically. To replay first launch, run once with reset
+enabled, then disable it before checking the returning-user flow. These overrides are generated as
+release-safe resource values; release always uses normal geography and never resets consent.
+
+Before release, create and publish the required GDPR message and privacy-options form in AdMob
+Privacy & messaging, enable Consent Mode in AdMob, and verify all four consent signals in Firebase
+Analytics debug logs. The Settings row is displayed only when UMP reports that privacy options are
+required.
+
+### Production ad unit requirement
+
+The Dashboard integration loads a banner directly with the Google Mobile Ads SDK. It therefore
+requires a **standard AdMob Banner ad unit**. A Partner Bidding ad unit created for a third-party
+mediation platform is not compatible with this direct integration and must not be supplied as
+`HABLYRA_ADMOB_BANNER_ID`.
+
+Release builds run `validateReleaseAdMobConfiguration` before `preReleaseBuild`. They fail when an
+identifier is missing or does not have the appropriate app-ID (`~`) or ad-unit-ID (`/`) shape. This
+format validation cannot distinguish a standard unit from Partner Bidding; that serving type must be
+verified in the AdMob console.
+
+Local configuration in `~/.gradle/gradle.properties`:
+
+```properties
+HABLYRA_ADMOB_APP_ID=<production-app-id>
+HABLYRA_ADMOB_BANNER_ID=<standard-production-banner-id>
+```
+
+Equivalent environment variables are supported. The manual Android release workflow reads both
+names from GitHub repository or environment variables without embedding values in the workflow:
+
+```yaml
+jobs:
+  release:
+    environment: production
+    env:
+      HABLYRA_ADMOB_APP_ID: ${{ vars.HABLYRA_ADMOB_APP_ID }}
+      HABLYRA_ADMOB_BANNER_ID: ${{ vars.HABLYRA_ADMOB_BANNER_ID }}
+```
+
+The values must be configured under **Settings > Secrets and variables > Actions > Variables** before
+running `.github/workflows/release.yml`. Signing material is stored separately as encrypted GitHub
+Actions secrets; see `docs/RELEASING.md`.

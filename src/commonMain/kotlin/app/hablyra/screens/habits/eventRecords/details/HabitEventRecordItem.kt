@@ -26,7 +26,8 @@ import app.hablyra.screens.root.RootRoute
 
 @Composable
 fun LazyItemScope.HabitRecordItem(
-    item: HabitEventRecord
+    item: HabitEventRecord,
+    habitName: String? = null
 ) {
     val environment = LocalAppEnvironment.current
     val navController = LocalRootNavController.current
@@ -42,6 +43,7 @@ fun LazyItemScope.HabitRecordItem(
         eventCountText = strings.eventCount(item.eventCount),
         comment = item.comment,
         editContentDescription = strings.editEventContentDescription(),
+        habitName = habitName,
         onClick = {
             navController.navigate(
                 RootRoute.HabitEventRecordEditing(
@@ -60,7 +62,8 @@ fun EventRecordItemContent(
     comment: String,
     editContentDescription: String,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    habitName: String? = null
 ) {
     val spacing = HablyraTheme.spacing
     val colors = HablyraTheme.colors
@@ -78,8 +81,17 @@ fun EventRecordItemContent(
         ) {
             Column(
                 modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(spacing.space8)
+                verticalArrangement = Arrangement.spacedBy(spacing.space4)
             ) {
+                if (habitName != null) {
+                    Text(
+                        text = habitName,
+                        color = colors.brandPrimary,
+                        style = MaterialTheme.typography.labelLarge,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
                 Text(
                     text = dateTimeText,
                     color = colors.contentPrimary,

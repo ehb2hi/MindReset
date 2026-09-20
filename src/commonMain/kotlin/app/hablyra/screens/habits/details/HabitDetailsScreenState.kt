@@ -32,6 +32,7 @@ data class HabitDetailsScreenState(
     val habitEventRecords: List<HabitEventRecord>,
     val abstinenceRanges: List<ClosedRange<Instant>>,
     val abstinence: Duration?,
+    val longestAbstinence: Duration?,
     val calendarRanges: List<ClosedRange<LocalDate>>,
     val abstinenceHistogramValues: List<Float>,
     val statistics: List<StatisticData>
@@ -76,6 +77,9 @@ fun rememberHabitDetailsScreenState(habitId: Int): HabitDetailsScreenState? {
     val abstinence = remember(lastRecord, currentTime) {
         lastRecord?.abstinence(currentTime)
     }
+    val longestAbstinence = remember(abstinenceRanges) {
+        abstinenceRanges.maxOfOrNull { it.duration() }
+    }
     val calendarRanges = remember(eventRecords, timeZone) {
         eventRecords.map {
             it.timeRange().toLocalDateTimeRange(timeZone).toLocalDateRange().ascended()
@@ -105,6 +109,7 @@ fun rememberHabitDetailsScreenState(habitId: Int): HabitDetailsScreenState? {
         eventRecords,
         abstinenceRanges,
         abstinence,
+        longestAbstinence,
         calendarRanges,
         abstinenceHistogramValues,
         statisticsData
@@ -114,6 +119,7 @@ fun rememberHabitDetailsScreenState(habitId: Int): HabitDetailsScreenState? {
             eventRecords,
             abstinenceRanges,
             abstinence,
+            longestAbstinence,
             calendarRanges,
             abstinenceHistogramValues,
             statisticsData

@@ -16,7 +16,6 @@ import epicarchitect.calendar.compose.pager.EpicCalendarPager
 import epicarchitect.calendar.compose.pager.state.rememberEpicCalendarPagerState
 import epicarchitect.calendar.compose.ranges.drawEpicRanges
 import app.hablyra.datetime.toMonthOfYear
-import app.hablyra.design.HablyraCard
 import app.hablyra.design.HablyraTheme
 import app.hablyra.environment.LocalAppEnvironment
 import app.hablyra.screens.root.LocalRootNavController
@@ -35,12 +34,14 @@ fun HabitDetailsCalendarCard(
     val spacing = HablyraTheme.spacing
     val colors = HablyraTheme.colors
 
-    HablyraCard(modifier) {
+    Column(
+        modifier = modifier
+    ) {
         Column(
             modifier = Modifier.padding(vertical = spacing.space16)
         ) {
             Text(
-                modifier = Modifier.padding(horizontal = spacing.space16),
+                modifier = Modifier,
                 text = monthFormatter.format(calendarState.currentMonth.toMonthOfYear()),
                 color = colors.contentPrimary,
                 style = MaterialTheme.typography.titleMedium
@@ -48,7 +49,7 @@ fun HabitDetailsCalendarCard(
 
             EpicCalendarPager(
                 pageModifier = {
-                    Modifier.drawEpicRanges(state.calendarRanges, colors.brandPrimary)
+                    Modifier.drawEpicRanges(state.calendarRanges, colors.calendarActive)
                 },
                 dayOfMonthContent = { date ->
                     val basisState = LocalBasisEpicCalendarState.current!!

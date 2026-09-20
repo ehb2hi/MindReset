@@ -26,7 +26,12 @@ data class HablyraColors(
     val error: Color,
     val errorContainer: Color,
     val info: Color,
-    val infoContainer: Color
+    val infoContainer: Color,
+    val chartPrimary: Color,
+    val chartSecondary: Color,
+    val calendarActive: Color,
+    val calendarInactive: Color,
+    val navigationIndicator: Color
 )
 
 val LightHablyraColors = HablyraColors(
@@ -51,7 +56,12 @@ val LightHablyraColors = HablyraColors(
     error = Color(0xFFD95C5C),
     errorContainer = Color(0xFFFCE8E8),
     info = Color(0xFF7C6EE6),
-    infoContainer = Color(0xFFEEEAFE)
+    infoContainer = Color(0xFFEEEAFE),
+    chartPrimary = Color(0xFF2E7D6B),
+    chartSecondary = Color(0xFFA7D7C5),
+    calendarActive = Color(0xFF2E7D6B),
+    calendarInactive = Color(0xFFE4E7EC),
+    navigationIndicator = Color(0xFFDFF7E9)
 )
 
 val DarkHablyraColors = HablyraColors(
@@ -76,5 +86,10 @@ val DarkHablyraColors = HablyraColors(
     error = Color(0xFFEF8585),
     errorContainer = Color(0xFF432121),
     info = Color(0xFFA99AF4),
-    infoContainer = Color(0xFF2A254A)
+    infoContainer = Color(0xFF2A254A),
+    chartPrimary = Color(0xFF71C8AE),
+    chartSecondary = Color(0xFF244A40),
+    calendarActive = Color(0xFF71C8AE),
+    calendarInactive = Color(0xFF2B3A40),
+    navigationIndicator = Color(0xFF244A40)
 )

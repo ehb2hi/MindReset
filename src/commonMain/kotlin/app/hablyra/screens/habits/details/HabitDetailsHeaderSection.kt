@@ -17,16 +17,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import app.hablyra.design.HablyraPrimaryButton
 import app.hablyra.design.HablyraTheme
 import app.hablyra.design.LoopMark
-import app.hablyra.design.ProgressMetric
 import app.hablyra.environment.LocalAppEnvironment
 import app.hablyra.format.DurationFormatter
 import app.hablyra.screens.root.LocalRootNavController
 import app.hablyra.screens.root.RootRoute
-
 
 @Composable
 fun HabitDetailsHeaderSection(
@@ -36,13 +35,26 @@ fun HabitDetailsHeaderSection(
     val environment = LocalAppEnvironment.current
     val navController = LocalRootNavController.current
     val durationFormatter = environment.format.durationFormatter
-    val strings = environment.resources.strings.habitDashboardStrings
-    val habitIcons = environment.habits.icons
+    val strings = environment.resources.strings
+    val habitStrings = strings.habitDashboardStrings
     val spacing = HablyraTheme.spacing
     val colors = HablyraTheme.colors
-    val progressText = state.abstinence?.let {
+    val currentText = state.abstinence?.let {
         durationFormatter.format(it, DurationFormatter.Accuracy.SECONDS)
-    } ?: strings.habitHasNoEvents()
+    } ?: habitStrings.habitHasNoEvents()
+    val longestText = state.longestAbstinence?.let {
+        durationFormatter.format(it, DurationFormatter.Accuracy.SECONDS)
+    }
+    val progress = if (
+        state.abstinence != null &&
+        state.longestAbstinence != null &&
+        state.longestAbstinence > kotlin.time.Duration.ZERO
+    ) {
+        (state.abstinence.inWholeMilliseconds.toFloat() /
+            state.longestAbstinence.inWholeMilliseconds.toFloat()).coerceIn(0f, 1f)
+    } else {
+        0f
+    }
 
     Column(
         modifier = modifier,
@@ -60,9 +72,9 @@ fun HabitDetailsHeaderSection(
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    imageVector = habitIcons.getById(state.habit.iconId).imageVector,
+                    imageVector = environment.habits.icons.getById(state.habit.iconId).imageVector,
                     tint = colors.brandPrimary,
-                    contentDescription = state.habit.name
+                    contentDescription = null
                 )
             }
             Text(
@@ -71,17 +83,39 @@ fun HabitDetailsHeaderSection(
                 color = colors.contentPrimary,
                 style = MaterialTheme.typography.headlineMedium,
                 overflow = TextOverflow.Ellipsis,
-                maxLines = 2
+                maxLines = 3
             )
-            LoopMark(size = spacing.space48)
         }
-
-        ProgressMetric(
+        Column(
             modifier = Modifier.fillMaxWidth(),
-            label = strings.currentStreakLabel(),
-            value = progressText
-        )
-
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(spacing.space8)
+        ) {
+            LoopMark(
+                size = spacing.space40 + spacing.space40 + spacing.space32,
+                progress = progress,
+                contentDescription = strings.streakProgressDescription()
+            )
+            Text(
+                text = habitStrings.currentStreakLabel(),
+                color = colors.contentSecondary,
+                style = MaterialTheme.typography.labelLarge
+            )
+            Text(
+                text = currentText,
+                color = colors.contentPrimary,
+                style = MaterialTheme.typography.displaySmall,
+                textAlign = TextAlign.Center
+            )
+            if (longestText != null) {
+                Text(
+                    text = strings.longestStreakLabel() + ": " + longestText,
+                    color = colors.contentSecondary,
+                    style = MaterialTheme.typography.bodyMedium,
+                    textAlign = TextAlign.Center
+                )
+            }
+        }
         HablyraPrimaryButton(
             modifier = Modifier.fillMaxWidth(),
             onClick = {
@@ -93,8 +127,8 @@ fun HabitDetailsHeaderSection(
                 )
             }
         ) {
-            Icon(imageVector = Icons.Filled.Add, contentDescription = null)
-            Text(text = strings.addHabitEventRecord())
+            Icon(Icons.Filled.Add, contentDescription = null)
+            Text(habitStrings.addHabitEventRecord())
         }
     }
 }

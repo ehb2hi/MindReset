@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -25,6 +26,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import app.hablyra.environment.LocalAppEnvironment
@@ -34,6 +36,8 @@ fun SimpleTopAppBar(
     title: String,
     modifier: Modifier = Modifier,
     onBackClick: (() -> Unit)? = null,
+    navigationIcon: ImageVector = Icons.AutoMirrored.Filled.ArrowBack,
+    navigationContentDescription: String? = null,
     actions: @Composable () -> Unit = {}
 ) {
     val strings = LocalAppEnvironment.current.resources.strings
@@ -43,7 +47,7 @@ fun SimpleTopAppBar(
         color = MaterialTheme.colorScheme.background
     ) {
         Row(
-            modifier = Modifier.height(46.dp),
+            modifier = Modifier.heightIn(min = 56.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             if (onBackClick != null) {
@@ -51,8 +55,8 @@ fun SimpleTopAppBar(
                     onClick = onBackClick
                 ) {
                     Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = strings.backButtonContentDescription()
+                        imageVector = navigationIcon,
+                        contentDescription = navigationContentDescription ?: strings.backButtonContentDescription()
                     )
                 }
             } else {
@@ -84,21 +88,30 @@ fun SimpleScrollableScreen(
     modifier: Modifier = Modifier,
     scrollState: ScrollState = rememberScrollState(),
     onBackClick: (() -> Unit)? = null,
+    navigationIcon: ImageVector = Icons.AutoMirrored.Filled.ArrowBack,
+    navigationContentDescription: String? = null,
     actions: @Composable () -> Unit = {},
+    footer: (@Composable () -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit
 ) {
-    Column(modifier) {
+    Column(modifier.fillMaxSize()) {
         SimpleTopAppBar(
             title = title,
             onBackClick = onBackClick,
+            navigationIcon = navigationIcon,
+            navigationContentDescription = navigationContentDescription,
             actions = actions
         )
 
         Column(
             modifier = Modifier
-                .fillMaxSize()
+                .weight(1f)
                 .verticalScroll(scrollState),
             content = content
         )
+
+        if (footer != null) {
+            footer()
+        }
     }
 }

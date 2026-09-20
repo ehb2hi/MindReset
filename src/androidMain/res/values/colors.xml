@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="hablyra_launcher_background">#173B35</color>
+    <color name="hablyra_launcher_mark">#D5EEE4</color>
+    <color name="hablyra_splash_background">#F6F8F7</color>
+    <color name="hablyra_splash_mark">#2E7D6B</color>
+</resources>

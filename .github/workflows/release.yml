@@ -1,0 +1,229 @@
+name: Android release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Release version, for example 1.0.0
+        required: true
+        type: string
+      version_code:
+        description: Increasing Play Store version code
+        required: true
+        type: number
+      runner:
+        description: Build runner
+        required: true
+        default: github-hosted
+        type: choice
+        options:
+          - github-hosted
+          - physical
+      upload_bundle:
+        description: Build and attach Android App Bundle (.aab)
+        required: true
+        default: true
+        type: boolean
+      upload_apk:
+        description: Build and attach release APK (.apk)
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+
+concurrency:
+  group: android-release-${{ inputs.version }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Release v${{ inputs.version }}
+    environment: production
+    runs-on: ${{ inputs.runner == 'physical' && 'self-hosted' || 'ubuntu-latest' }}
+    timeout-minutes: 60
+
+    steps:
+      - name: Check out main
+        uses: actions/checkout@v7
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Validate release inputs
+        id: release
+        shell: bash
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
+          INPUT_VERSION_CODE: ${{ inputs.version_code }}
+          BUILD_BUNDLE: ${{ inputs.upload_bundle }}
+          BUILD_APK: ${{ inputs.upload_apk }}
+        run: |
+          set -euo pipefail
+
+          version="${INPUT_VERSION#v}"
+          if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+([.-][0-9A-Za-z.-]+)?$ ]]; then
+            echo "Release version must look like 1.2.3 or 1.2.3-beta.1." >&2
+            exit 1
+          fi
+          if [[ ! "$INPUT_VERSION_CODE" =~ ^[1-9][0-9]*$ ]]; then
+            echo "Version code must be a positive integer." >&2
+            exit 1
+          fi
+          if [[ "$BUILD_BUNDLE" != "true" && "$BUILD_APK" != "true" ]]; then
+            echo "Select at least one release artifact: bundle or APK." >&2
+            exit 1
+          fi
+
+          tag="v$version"
+          branch="release/$tag"
+          if git ls-remote --exit-code --heads origin "$branch" >/dev/null 2>&1; then
+            echo "Release branch $branch already exists." >&2
+            exit 1
+          fi
+          if git ls-remote --exit-code --tags origin "refs/tags/$tag" >/dev/null 2>&1; then
+            echo "Release tag $tag already exists." >&2
+            exit 1
+          fi
+
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "version_code=$INPUT_VERSION_CODE" >> "$GITHUB_OUTPUT"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "branch=$branch" >> "$GITHUB_OUTPUT"
+
+      - name: Create local release branch
+        shell: bash
+        env:
+          RELEASE_BRANCH: ${{ steps.release.outputs.branch }}
+        run: git switch --create "$RELEASE_BRANCH"
+
+      - name: Set up Java
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          cache-provider: basic
+
+      - name: Decode upload keystore
+        shell: bash
+        env:
+          KEYSTORE_BASE64: ${{ secrets.HABLYRA_UPLOAD_KEYSTORE_BASE64 }}
+          KEY_ALIAS: ${{ secrets.HABLYRA_UPLOAD_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.HABLYRA_UPLOAD_KEY_PASSWORD }}
+          STORE_PASSWORD: ${{ secrets.HABLYRA_UPLOAD_STORE_PASSWORD }}
+        run: |
+          set -euo pipefail
+          : "${KEYSTORE_BASE64:?Missing HABLYRA_UPLOAD_KEYSTORE_BASE64 repository secret}"
+          : "${KEY_ALIAS:?Missing HABLYRA_UPLOAD_KEY_ALIAS repository secret}"
+          : "${KEY_PASSWORD:?Missing HABLYRA_UPLOAD_KEY_PASSWORD repository secret}"
+          : "${STORE_PASSWORD:?Missing HABLYRA_UPLOAD_STORE_PASSWORD repository secret}"
+          printf '%s' "$KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/hablyra-upload.jks"
+          chmod 600 "$RUNNER_TEMP/hablyra-upload.jks"
+
+      - name: Decode release Firebase configuration
+        shell: bash
+        env:
+          GOOGLE_SERVICES_BASE64: ${{ secrets.HABLYRA_GOOGLE_SERVICES_JSON_BASE64 }}
+        run: |
+          set -euo pipefail
+          : "${GOOGLE_SERVICES_BASE64:?Missing HABLYRA_GOOGLE_SERVICES_JSON_BASE64 repository secret}"
+          printf '%s' "$GOOGLE_SERVICES_BASE64" | base64 --decode > google-services.json
+          chmod 600 google-services.json
+
+      - name: Build selected release artifacts
+        shell: bash
+        env:
+          BUILD_BUNDLE: ${{ inputs.upload_bundle }}
+          BUILD_APK: ${{ inputs.upload_apk }}
+          HABLYRA_VERSION_NAME: ${{ steps.release.outputs.version }}
+          HABLYRA_VERSION_CODE: ${{ steps.release.outputs.version_code }}
+          HABLYRA_ADMOB_APP_ID: ${{ vars.HABLYRA_ADMOB_APP_ID }}
+          HABLYRA_ADMOB_BANNER_ID: ${{ vars.HABLYRA_ADMOB_BANNER_ID }}
+          HABLYRA_UPLOAD_KEYSTORE_PATH: ${{ runner.temp }}/hablyra-upload.jks
+          HABLYRA_UPLOAD_KEY_ALIAS: ${{ secrets.HABLYRA_UPLOAD_KEY_ALIAS }}
+          HABLYRA_UPLOAD_KEY_PASSWORD: ${{ secrets.HABLYRA_UPLOAD_KEY_PASSWORD }}
+          HABLYRA_UPLOAD_STORE_PASSWORD: ${{ secrets.HABLYRA_UPLOAD_STORE_PASSWORD }}
+        run: |
+          set -euo pipefail
+          tasks=()
+          [[ "$BUILD_BUNDLE" == "true" ]] && tasks+=(bundleRelease)
+          [[ "$BUILD_APK" == "true" ]] && tasks+=(assembleRelease)
+          ./gradlew --no-daemon clean "${tasks[@]}"
+
+      - name: Verify and stage release artifacts
+        shell: bash
+        env:
+          BUILD_BUNDLE: ${{ inputs.upload_bundle }}
+          BUILD_APK: ${{ inputs.upload_apk }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/hablyra-release"
+
+          if [[ "$BUILD_BUNDLE" == "true" ]]; then
+            mapfile -t bundles < <(find build/outputs/bundle/release -maxdepth 1 -type f -name '*.aab')
+            [[ "${#bundles[@]}" -eq 1 ]] || { echo "Expected exactly one release AAB." >&2; exit 1; }
+            jarsigner -verify "${bundles[0]}" 2>&1 | grep -q "jar verified."
+            cp "${bundles[0]}" "$RUNNER_TEMP/hablyra-release/"
+          fi
+
+          if [[ "$BUILD_APK" == "true" ]]; then
+            mapfile -t apks < <(find build/outputs/apk/release -maxdepth 1 -type f -name '*.apk' ! -name '*unsigned*')
+            [[ "${#apks[@]}" -eq 1 ]] || { echo "Expected exactly one signed release APK." >&2; exit 1; }
+            sdk_root="${ANDROID_SDK_ROOT:-${ANDROID_HOME:-}}"
+            apksigner="$(find "$sdk_root/build-tools" -type f -name apksigner | sort -V | tail -1)"
+            [[ -n "$apksigner" ]] || { echo "Android apksigner was not found." >&2; exit 1; }
+            "$apksigner" verify "${apks[0]}"
+            cp "${apks[0]}" "$RUNNER_TEMP/hablyra-release/"
+          fi
+
+      - name: Upload bundle artifact
+        if: ${{ inputs.upload_bundle }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: hablyra-${{ steps.release.outputs.version }}-bundle
+          path: ${{ runner.temp }}/hablyra-release/*.aab
+          if-no-files-found: error
+
+      - name: Upload APK artifact
+        if: ${{ inputs.upload_apk }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: hablyra-${{ steps.release.outputs.version }}-apk
+          path: ${{ runner.temp }}/hablyra-release/*.apk
+          if-no-files-found: error
+
+      - name: Push release branch and tag
+        shell: bash
+        env:
+          RELEASE_BRANCH: ${{ steps.release.outputs.branch }}
+          RELEASE_TAG: ${{ steps.release.outputs.tag }}
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git push origin "HEAD:refs/heads/$RELEASE_BRANCH"
+          git tag --annotate "$RELEASE_TAG" --message "Hablyra $RELEASE_TAG"
+          git push origin "refs/tags/$RELEASE_TAG"
+
+      - name: Create GitHub release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ steps.release.outputs.tag }}
+          RELEASE_VERSION: ${{ steps.release.outputs.version }}
+        run: |
+          set -euo pipefail
+          mapfile -t assets < <(find "$RUNNER_TEMP/hablyra-release" -maxdepth 1 -type f | sort)
+          gh release create "$RELEASE_TAG" "${assets[@]}" \
+            --title "Hablyra $RELEASE_VERSION" \
+            --generate-notes
+
+      - name: Remove decoded release credentials
+        if: ${{ always() }}
+        shell: bash
+        run: rm -f "$RUNNER_TEMP/hablyra-upload.jks" google-services.json

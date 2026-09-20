@@ -1,4 +1,4 @@
-rootProject.name = "breakbadhabits"
+rootProject.name = "Hablyra"
 
 pluginManagement {
     repositories {
@@ -6,6 +6,9 @@ pluginManagement {
         google()
         gradlePluginPortal()
     }
+}
+plugins {
+    id("org.gradle.toolchains.foojay-resolver-convention") version "0.10.0"
 }
 
 dependencyResolutionManagement {

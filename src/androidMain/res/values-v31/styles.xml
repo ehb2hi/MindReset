@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="App.Theme.Starting" parent="App.Theme">
+        <item name="android:windowSplashScreenBackground">@color/hablyra_splash_background</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/ic_hablyra_splash_mark</item>
+        <item name="android:windowSplashScreenAnimationDuration">0</item>
+        <item name="android:windowBackground">@drawable/splash_screen</item>
+    </style>
+</resources>

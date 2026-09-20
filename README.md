@@ -1,5 +1,5 @@
-# Break Bad Habits
+exit# Hablyra
 
-Bad habit tracking app for Android. Contains some experiments with Compose Multiplatform for iOS.
+Private behavior reset tracker for Android. Contains Compose Multiplatform experiments for iOS.
 
-Google play - [link](https://play.google.com/store/apps/details?id=kolmachikhin.alexander.breakbadhabits)
+Google play - [link](https://play.google.com/store/apps/details?id=app.hablyra.mobile)
